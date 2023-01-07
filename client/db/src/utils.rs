@@ -47,12 +47,6 @@ fn open_parity_db<Block: BlockT, C>(
 where
 	C: sp_blockchain::HeaderBackend<Block> + Send + Sync,
 {
-	// first upgrade database to required version
-	#[cfg(not(test))]
-	match crate::upgrade::upgrade_db::<Block, C>(client, path, _source) {
-		Ok(_) => (),
-		Err(_) => return Err("Frontier DB upgrade error".to_string()),
-	}
 	let mut config = parity_db::Options::with_columns(path, crate::columns::NUM_COLUMNS as u8);
 	config.columns[crate::columns::BLOCK_MAPPING as usize].btree_index = true;
 
