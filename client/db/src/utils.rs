@@ -58,8 +58,7 @@ where
 
 	let db = parity_db::Db::open_or_create(&config).map_err(|err| format!("{}", err))?;
 	// write database version only after the database is succesfully opened
-	#[cfg(not(test))]
-	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
+	
 	Ok(Arc::new(crate::parity_db_adapter::DbAdapter(db)))
 }
 
