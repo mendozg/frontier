@@ -33,63 +33,9 @@ where
 		DatabaseSource::ParityDb { path } => {
 			open_parity_db::<Block, C>(client, path, &config.source)?
 		}
-		DatabaseSource::RocksDb { path, .. } => {
-			open_kvdb_rocksdb::<Block, C>(client, path, true, &config.source)?
-		}
-		DatabaseSource::Auto {
-			paritydb_path,
-			rocksdb_path,
-			..
-		} => {
-			match open_kvdb_rocksdb::<Block, C>(client.clone(), rocksdb_path, false, &config.source)
-			{
-				Ok(db) => db,
-				Err(_) => open_parity_db::<Block, C>(client, paritydb_path, &config.source)?,
-			}
-		}
 		_ => return Err("Missing feature flags `parity-db`".to_string()),
 	};
 	Ok(db)
-}
-
-#[cfg(feature = "kvdb-rocksdb")]
-fn open_kvdb_rocksdb<Block: BlockT, C>(
-	client: Arc<C>,
-	path: &Path,
-	create: bool,
-	_source: &DatabaseSource,
-) -> Result<Arc<dyn Database<DbHash>>, String>
-where
-	C: sp_blockchain::HeaderBackend<Block> + Send + Sync,
-{
-	// first upgrade database to required version
-	#[cfg(not(test))]
-	match crate::upgrade::upgrade_db::<Block, C>(client, path, _source) {
-		Ok(_) => (),
-		Err(_) => return Err("Frontier DB upgrade error".to_string()),
-	}
-
-	let mut db_config = kvdb_rocksdb::DatabaseConfig::with_columns(crate::columns::NUM_COLUMNS);
-	db_config.create_if_missing = create;
-
-	let db = kvdb_rocksdb::Database::open(&db_config, path).map_err(|err| format!("{}", err))?;
-	// write database version only after the database is succesfully opened
-	#[cfg(not(test))]
-	crate::upgrade::update_version(path).map_err(|_| "Cannot update db version".to_string())?;
-	return Ok(sp_database::as_database(db));
-}
-
-#[cfg(not(feature = "kvdb-rocksdb"))]
-fn open_kvdb_rocksdb<Block: BlockT, C>(
-	_client: Arc<C>,
-	_path: &Path,
-	_create: bool,
-	_source: &DatabaseSource,
-) -> Result<Arc<dyn Database<DbHash>>, String>
-where
-	C: sp_blockchain::HeaderBackend<Block> + Send + Sync,
-{
-	Err("Missing feature flags `kvdb-rocksdb`".to_string())
 }
 
 #[cfg(feature = "parity-db")]
