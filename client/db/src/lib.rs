@@ -17,8 +17,6 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #[cfg(feature = "parity-db")]
-mod parity_db_adapter;
-mod upgrade;
 mod utils;
 
 use std::{
