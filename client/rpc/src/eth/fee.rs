@@ -71,7 +71,7 @@ where
 			self.backend.as_ref(),
 			Some(newest_block),
 		) {
-			let hash = self.client.expect_block_hash_from_id(id);
+			let hash = self.client.expect_block_hash_from_id(&id);
 			let header = match self.client.header(hash) {
 				Ok(Some(h)) => h,
 				_ => {
