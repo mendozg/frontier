@@ -151,8 +151,8 @@ pub mod frontier_backend_client {
 		BE: Backend<B> + 'static,
 		BE::State: StateBackend<BlakeTwo256>,
 	{
-		let hash = client.hash(at);
 		
+		let hash = client.expect_block_hash_from_id(&at).unwrap();
 		if let Ok(Some(header)) = client.header(hash) {
 			match client.storage(header.hash(), &StorageKey(PALLET_ETHEREUM_SCHEMA.to_vec())) {
 				Ok(Some(bytes)) => Decode::decode(&mut &bytes.0[..])
