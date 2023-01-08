@@ -483,7 +483,7 @@ where
 		.map(|in_pool_tx| in_pool_tx.data().clone())
 		.collect::<Vec<<B as BlockT>::Extrinsic>>();
 	// Manually initialize the overlay.
-	if let Ok(Some(header)) = client.header(best) {
+	if let Ok(Some(header)) = client.header(client.info().best_hash) {
 		let parent_hash = BlockId::Hash(*header.parent_hash());
 		api.initialize_block(&parent_hash, &header)
 			.map_err(|e| internal_err(format!("Runtime api access error: {:?}", e)))?;
