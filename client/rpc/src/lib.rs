@@ -169,7 +169,7 @@ pub mod frontier_backend_client {
 		C: HeaderBackend<B> + Send + Sync + 'static,
 	{
 		if let Ok(Some(number)) = client.number(target_hash) {
-			if let Ok(Some(header)) = client.header(BlockId::Number(number)) {
+			if let Ok(Some(header)) = client.header(target_hash) {
 				return header.hash() == target_hash;
 			}
 		}
