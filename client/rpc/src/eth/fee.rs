@@ -71,7 +71,8 @@ where
 			self.backend.as_ref(),
 			Some(newest_block),
 		) {
-			let header = match self.client.header(id) {
+			let hash = self.client.expect_block_hash_from_id(id);
+			let header = match self.client.header(hash) {
 				Ok(Some(h)) => h,
 				_ => {
 					return Err(internal_err(format!("Failed to retrieve header at {}", id)));
